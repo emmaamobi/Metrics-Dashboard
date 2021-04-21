@@ -7,7 +7,6 @@ def main():
     calc = Calculations(db_file)
     conn = calc.create_connection(db_file)
     cursor= conn.cursor()
-    calc.calculate_issue_density(conn)
     cursor.execute(
         "DROP TABLE IF EXISTS CALCULATIONS;"
     )
@@ -33,6 +32,15 @@ def main():
     )
     data = calc.team_effort_per_commit(conn)
     sql = 'insert into Team_Effort(commit_sha, team_effort) VALUES(?,?);'
+    cursor.executemany(sql,data)
+    conn.commit()
+    sys.exit(0)
+
+    cursor.execute(
+        "CREATE TABLE IF NOT EXISTS issue_Density (commit_sha VARCHAR(3000), commit_date VARCHAR(100) issue_density VARCHAR(3000));"
+    )
+    data = calc.calculate_issue_density(conn)
+    sql = 'insert into issue_Density(commit_sha, commit_date, issue_density) VALUES(?,?,?);'
     cursor.executemany(sql,data)
     conn.commit()
     # insert calculations into table

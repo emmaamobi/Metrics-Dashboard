@@ -143,38 +143,39 @@ class Calculations:
         cur = conn.cursor()
         cur.execute("SELECT Commit_SHA,Commit_Date from Commits")
         commits = cur.fetchall()
-        commits = [(i[0],to_dt(i[1]),"commit") for i in commits] # convert to datetime obj, "commit" means it's a commit
-        issues_x_commits = issues + commits # join issues and commits 
-        issues_x_commits = sorted(issues_x_commits, key=lambda x: x[1])#sort by date
-        print("ISSUES COMMTIS: \n")
-        print(issues_x_commits)
+        # commits = [(i[0],to_dt(i[1]),"commit") for i in commits] # convert to datetime obj, "commit" means it's a commit
+        commits = [[i[0],to_dt(i[1]),0, 0] for i in commits] # convert to datetime obj, "commit" means it's a commit
+        # issues_x_commits = issues + commits # join issues and commits 
+        # issues_x_commits = sorted(issues_x_commits, key=lambda x: x[1])#sort by date
+        commits = sorted(commits, key=lambda x:x[1])
+        issues = sorted(issues, key=lambda x:x[1])
 
         #  Track and update issues per commit
-        issues_per_commit = []
-        total_issues_updating = []
-        for item in issues_x_commits:
-            if item[3] != "commit":
-                total_issues_updating.append(1) # count issue
+        for commit in commits:
+            issue_count = 0
+            i = 0
+            while issues[i][1] < commit[1]: # issue opened before commit date
+                if not issues[i][2]: # if issue hasn't been closed
+                    issue_count += 1
+                else:
+                    if issues[i][2] >= commit[1]: # if issue closed date is after commit date
+                        issue_count += 1
+                i += 1
 
-                if item[3]
+            commit[2] = issue_count # total active issues for commit
+            issue_count = 0 # reset issue count
 
-        
+            
+        # TODO: put code size in 4th space in commits, i[3]
+        def do_iss_density(issue_count,code_size):
+            return ((issue_count/code_size),2)
+        # TODO calculate issue density per commit
+        issue_density = [(i[0],i[1],do_iss_density(i[2],i[3])) for i in commits]
         sys.exit(0)
 
         
         return issue_density
 
-    # def get_tloc(self,conn:Connection) -> int:
-    #     '''
-    #     Return total loc for main branch
-    #     :param conn: The db connection
-    #     '''
-    #     cur = conn.cursor()
-    #     query = "SELECT SUM(Lines_Of_Code) from Files where Branch='main'"
-    #     cur.execute(query)
-    #     result = cur.fetchall()[0][0]
-    #
-    #     return result
 
     def get_avg_days_to_close_issue(self,conn: Connection) -> float:
         ''' 
