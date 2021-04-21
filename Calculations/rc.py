@@ -7,12 +7,14 @@ def main():
     calc = Calculations(db_file)
     conn = calc.create_connection(db_file)
     cursor= conn.cursor()
+    calc.calculate_issue_density(conn)
     cursor.execute(
         "DROP TABLE IF EXISTS CALCULATIONS;"
     )
     cursor.execute(
         "CREATE TABLE IF NOT EXISTS CALCULATIONS (calc_name VARCHAR(3000), value VARCHAR(3000));"
     )
+
     data = [
         ('closed to open ratio',calc.get_closed_to_open_ratio(conn)),
         ('closing efficiency (%)',calc.get_closing_efficiency(conn)),

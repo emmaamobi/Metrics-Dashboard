@@ -1,6 +1,7 @@
 import sqlite3 
 from sqlite3 import Cursor, Connection
 import datetime as dt
+import sys
 class Calculations:
     def __init__(self, db_file: str) -> None:
         ''' 
@@ -126,18 +127,35 @@ class Calculations:
         return effort
 
     # deprecated, will be implemented as a function of time or per commit
-    # def calculate_issue_density(self, conn:Connection) -> float: 
-    #     '''
-    #     Returns Issue density per kloc
-    #     :param conn: The db connection
-    #     '''
-    #     total_issues = self.get_total_issues(conn)
-    #     total_loc = self.get_tloc(conn)
-    #     kloc = total_loc / 1000
-    #     issue_density = total_issues / kloc
-    #     issue_density = round(issue_density,2)
-    #     return issue_density
-    #
+    def calculate_issue_density(self, conn:Connection) -> float: 
+        '''
+        Returns Issue density per kloc
+        :param conn: The db connection
+        '''
+        def to_dt(time_str):
+            return dt.datetime.strptime(time_str, "%Y-%m-%dT%H:%M:%SZ")
+        # Get issues
+        cur = conn.cursor()
+        cur.execute("SELECT ID, Created_At_Date,Closed_At_Date from Issues")
+        issues = cur.fetchall()
+        issues = [(i[0],to_dt(i[1]),to_dt(i[2]) if i[2] else i[2]) for i in issues ] # convert to datetime obj
+        # Get commits
+        cur = conn.cursor()
+        cur.execute("SELECT Commit_SHA,Commit_Date from Commits")
+        commits = cur.fetchall()
+        commits = [(i[0],to_dt(i[1]),"commit") for i in commits] # convert to datetime obj, "commit" means it's a commit
+        issues_x_commits = issues + commits
+        issues_x_commits = sorted(issues_x_commits, key=lambda x: x[1])#sort by opened date
+        print("ISSUES COMMTIS: \n")
+        print(issues_x_commits)
+
+        #  Track issues per commit
+        
+        sys.exit(0)
+
+        
+        return issue_density
+
     # def get_tloc(self,conn:Connection) -> int:
     #     '''
     #     Return total loc for main branch
