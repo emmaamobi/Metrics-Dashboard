@@ -144,12 +144,20 @@ class Calculations:
         cur.execute("SELECT Commit_SHA,Commit_Date from Commits")
         commits = cur.fetchall()
         commits = [(i[0],to_dt(i[1]),"commit") for i in commits] # convert to datetime obj, "commit" means it's a commit
-        issues_x_commits = issues + commits
-        issues_x_commits = sorted(issues_x_commits, key=lambda x: x[1])#sort by opened date
+        issues_x_commits = issues + commits # join issues and commits 
+        issues_x_commits = sorted(issues_x_commits, key=lambda x: x[1])#sort by date
         print("ISSUES COMMTIS: \n")
         print(issues_x_commits)
 
-        #  Track issues per commit
+        #  Track and update issues per commit
+        issues_per_commit = []
+        total_issues_updating = []
+        for item in issues_x_commits:
+            if item[3] != "commit":
+                total_issues_updating.append(1) # count issue
+
+                if item[3]
+
         
         sys.exit(0)
 
