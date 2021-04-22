@@ -127,7 +127,7 @@ class Calculations:
         return effort
 
     # deprecated, will be implemented as a function of time or per commit
-    def calculate_issue_density(self, conn:Connection) -> float: 
+    def calculate_issue_density(self, conn:Connection) -> list: 
         '''
         Returns Issue density per kloc
         :param conn: The db connection
@@ -168,12 +168,9 @@ class Calculations:
             
         # TODO: put code size in 4th space in commits, i[3]
         def do_iss_density(issue_count,code_size):
-            return ((issue_count/code_size),2)
+            return round((issue_count/code_size),2)
         # TODO calculate issue density per commit
         issue_density = [(i[0],i[1],do_iss_density(i[2],i[3])) for i in commits]
-        sys.exit(0)
-
-        
         return issue_density
 
 
